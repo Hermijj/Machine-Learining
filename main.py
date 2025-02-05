@@ -2,6 +2,7 @@ from fastapi import FastAPI
 import joblib
 import pandas as pd
 from pydantic import BaseModel
+from pydantic import BaseModel
 
 # Load the trained model
 model = joblib.load("linear_regression_model.pkl")
@@ -16,7 +17,28 @@ class MedalsInput(BaseModel):
     team: str
     country: str
     year: int
+model = joblib.load("linear_regression_model.pkl")
+
+# Initialize FastAPI
+app = FastAPI(title="Olympic Medals Prediction API",
+              description="Predict the number of medals a team will win based on key features.",
+              version="1.0")
+
+# Define input data schema
+class MedalsInput(BaseModel):
+    team: str
+    country: str
+    year: int
     athletes: int
+    age: float
+    prev_medals: float
+
+# Welcome message endpoint
+@app.get("/")
+def welcome():
+    return {"message": "Welcome to the Olympic Medals Prediction API! Use /predict/ to get medal predictions."}
+
+# Define prediction endpoint
     age: float
     prev_medals: float
 
