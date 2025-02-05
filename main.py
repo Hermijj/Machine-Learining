@@ -1,33 +1,48 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from fastapi import FastAPI
 import joblib
 import pandas as pd
-import socket
+from pydantic import BaseModel
 
 # Load the trained model
-model = joblib.load('linear_regression_model.pkl')
+model = joblib.load("linear_regression_model.pkl")
 
-app = FastAPI()
+# Initialize FastAPI
+app = FastAPI(title="Olympic Medals Prediction API",
+              description="Predict the number of medals a team will win based on key features.",
+              version="1.0")
 
-class PredictionRequest(BaseModel):
+# Define input data schema
+class MedalsInput(BaseModel):
+    team: str
+    country: str
+    year: int
     athletes: int
-    prev_medals: int
+    age: float
+    prev_medals: float
 
+# Welcome message endpoint
+@app.get("/")
+def welcome():
+    return {"message": "Welcome to the Olympic Medals Prediction API! Use /predict/ to get medal predictions."}
+
+# Define prediction endpoint
 @app.post("/predict/")
-def predict(request: PredictionRequest):
+def predict_medals(data: MedalsInput):
     try:
-        data = pd.DataFrame([request.dict()])
-        prediction = model.predict(data)
-        return {"prediction": max(0, round(prediction[0]))}
-    except socket.timeout:
-        raise HTTPException(status_code=408, detail="Port scan timeout reached, no open ports detected on 0.0.0.0. Detected open ports on localhost -- did you mean to bind one of these to 0.0.0.0?")
+        # Convert input data to DataFrame
+        input_data = pd.DataFrame([data.dict()])
+
+        # Select the features used for prediction
+        predictors = ["athletes", "prev_medals"]
+        prediction = model.predict(input_data[predictors])[0]
+        prediction = max(0, round(prediction))  # Ensure non-negative integer output
+
+        return {
+            "message": "Prediction successful!",
+            "team": data.team,
+            "country": data.country,
+            "year": data.year,
+            "predicted_medals": prediction
+        }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to the Olympic Medals Prediction API"}
-
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to the Olympic Medals Prediction API"}
+        return {"error": "Prediction failed. Please check your input data.", "details": str(e)}
