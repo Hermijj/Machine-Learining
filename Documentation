@@ -85,12 +85,6 @@ Post-Prediction Adjustments:
 Predictions were rounded to the nearest whole number to match the nature of the target variable.
 
 
-
-
-
-
-
-
 5. Model Selection and Training Details
 Model Choice:
 
@@ -120,6 +114,8 @@ Prediction:
 predictions = reg.predict(test[predictors])
 test["predictions"] = predictions
 
+
+
 6. Model Evaluation Metrics and Discussion
 Evaluation Metrics:
 Mean Absolute Error (MAE): 
@@ -141,6 +137,8 @@ Discussion:
 Error analysis per team was also performed, where the average prediction error was calculated and analyzed relative to the mean medals per team.
 Visualizations (histograms) of the error distribution were used to assess model performance.
 
+
+
 7. Interpretation of Results
 Key Insights:
 The predictors athletes and prev_medals significantly contribute to the prediction of medals.
@@ -149,6 +147,8 @@ Key Insights:
 Implications:
 The linear regression model provides a straightforward approach for predicting Olympic medals based on historical data.
 The insights can help in identifying areas for further feature engineering or model complexity enhancements.
+
+
 
 8. Deployment Details and Instructions
 API Deployment with FastAPI:
