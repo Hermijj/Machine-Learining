@@ -1,195 +1,212 @@
-# Olympic Medals Prediction Project Report
+Debre Birhan University
+College of computing Department of Software Engineering
+Fundamental of machine learning
 
-## Debre Birhan University
-**College of Computing, Department of Software Engineering**  
-**Fundamentals of Machine Learning**  
 
-**Name:** Hermela Gashaw  
-**ID:** 1401389  
-**Submitted to:** Seble E  
-**Submission Date:** 02/02/2025  
+NAME: Hermela Gashaw
+ID:1401389
 
----
+Submitted to: Seble E
+Submission Date 02/02/2025:
 
-## Table of Contents
-1. [Problem Definition](#problem-definition)
-2. [Data Source & Description](#data-source--description)
-3. [Exploratory Data Analysis (EDA) Findings and Visualizations](#exploratory-data-analysis-eda-findings-and-visualizations)
-4. [Data Preprocessing Steps and Choices](#data-preprocessing-steps-and-choices)
-5. [Model Selection and Training Details](#model-selection-and-training-details)
-6. [Model Evaluation Metrics and Discussion](#model-evaluation-metrics-and-discussion)
-7. [Interpretation of Results](#interpretation-of-results)
-8. [Deployment Details and Instructions](#deployment-details-and-instructions)
-9. [Potential Limitations and Future Improvements](#potential-limitations-and-future-improvements)
-10. [References](#references)
 
----
+Olympic Medals Prediction Project Report
 
-## 1. Problem Definition
 
-### Objective
-Predict the number of medals an Olympic team will win based on historical performance data. This is approached as a regression task, with the number of medals being the target variable.
+1. Problem Definition
+Objective:
+Predict the number of medals an Olympic team will win based on historical performance data. This problem is approached as a regression task, with the number of medals being the target variable.
+Motivation:
+Understanding which factors contribute to a team’s success can help in strategizing and resource allocation. In this project, we focus on two key predictors:
+Athletes: The number of athletes on a team.
+Previous Medals: The count of medals won in prior events.
 
-**Interactive Element:**  
-- *Question*: What additional factors do you think could influence a team’s medal count? *(Add your thoughts below!)*
 
-### Motivation
-Understanding which factors contribute to a team’s success can help in strategizing and resource allocation. This project focuses on two key predictors:
-- **Athletes**: The number of athletes on a team.
-- **Previous Medals**: The count of medals won in prior events.
 
-**Interactive Element:**  
-- *Poll*: Which factor do you believe has a stronger influence on medal counts?
-  - [ ] Number of Athletes
-  - [ ] Previous Medals
+2. Data Source & Description
+ 
+Data source
+We'll be using data from the Olympics, which was originally on [Kaggle](https://www.kaggle.com/datasets/heesoo37/120-years-of-olympic-history-athletes-and-results).
+You can download the files we'll use in this project here:
+[teams.csv](https://drive.google.com/uc?export=download&id=1L3YAlts8tijccIndVPB-mOsRpEpVawk7) - the team-level data that we use in this project.
 
----
+Data Structure:
+The dataset is in CSV format and includes the following columns:
+team: Name of the team.
+country: Country that the team represents.
+year: Year of the Olympic event.
+athletes: Number of athletes in the team.
+age: Average age of the athletes.
+prev_medals: Number of medals won in previous events.
+medals: Number of medals won in the current event (target variable).
 
-## 2. Data Source & Description
 
-### Data Source
-We utilized data from the [120 Years of Olympic History: Athletes and Results](https://www.kaggle.com/datasets/heesoo37/120-years-of-olympic-history-athletes-and-results) dataset originally hosted on Kaggle.
+3. Exploratory Data Analysis (EDA) Findings and Visualizations
+Data Loading & Inspection:
+The dataset was loaded into a pandas DataFrame.
+Initial inspection revealed the structure and distribution of the data, including some missing values.
+Summary Statistics:
+Statistical summaries (mean, median, standard deviation) were computed for all numeric columns.
+These summaries provided insights into the central tendency and spread of the data.
+Correlation Analysis:
+A correlation matrix was computed for the numeric variables.
+The analysis revealed that the number of athletes and prev_medals have significant correlations with the target variable medals.
 
-**Interactive Element:**  
-- *Download*: [teams.csv](https://drive.google.com/uc?export=download&id=1L3YAlts8tijccIndVPB-mOsRpEpVawk7)
+Visualizations:
+Scatter Plots with Regression Lines: 
+oUsed seaborn.lmplot to visualize the relationships between athletes and medals, and between age and medals.
 
-### Dataset Overview
-- **Rows:** 2144  
-- **Columns:** 11
 
-### Column Descriptions
-- `team`: Name of the team
-- `country`: Country that the team represents
-- `year`: Year of the Olympic event
-- `athletes`: Number of athletes in the team
-- `age`: Average age of the athletes
-- `prev_medals`: Number of medals won in previous events
-- `medals`: Number of medals won in the current event *(target variable)*
-- `events`: Number of events participated in
-- `height`: Average height of athletes
-- `weight`: Average weight of athletes
-- `prev_3_medals`: Medals won in the last 3 years *(some missing values)*
+Histogram: 
+oPlotted the distribution of the medals variable to assess its distribution.
+These EDA steps helped identify key trends and potential outliers in the data.
 
----
 
-## 3. Exploratory Data Analysis (EDA) Findings and Visualizations
 
-### Visualizations
-- **Scatter Plots with Regression Lines**: Relationships between `athletes` vs `medals`, and `age` vs `medals`.
-- **Histograms**: Distribution of the `medals` variable.
+4. Data Preprocessing Steps and Choices
+Conversion and Cleaning:
+Numeric Conversion: 
+oApplied pd.to_numeric to convert columns to numeric types wherever possible.
+oDropped non-numeric columns that became entirely NaN after conversion.
+Handling Missing Values: 
+oIdentified rows with missing values using teams[teams.isnull().any(axis=1)].
+oRemoved rows containing missing values to ensure data quality.
+Feature Selection:
+For model training, the predictors selected were: 
+oathletes
+oprev_medals
+The target variable was medals.
+Train-Test Split:
+Data was split 80% into training and 20% testing sets based on the year: 
+oTraining set: year < 2012
+oTesting set: year >= 2012
+Post-Prediction Adjustments:
+Negative predictions (if any) were set to zero.
+Predictions were rounded to the nearest whole number to match the nature of the target variable.
 
-**Interactive Element:**  
-- *Visualization Embed*: View dynamic scatter plots and histograms [here](#) *(link to an interactive chart or embedded visualization)*.
 
----
 
-## 4. Data Preprocessing Steps and Choices
 
-### Feature Selection
-- **Predictors**: `athletes`, `prev_medals`
-- **Target Variable**: `medals`
 
-**Interactive Element:**  
-- *Question*: Are there other features you would include in the model? *(Share your ideas!)*
 
-### Post-Prediction Adjustments
-- Negative predictions set to zero.
-- Rounded predictions to the nearest whole number.
 
----
 
-## 5. Model Selection and Training Details
+5. Model Selection and Training Details
+Model Choice:
 
-### Model Training
-```python
+For this project, we chose a regression model—specifically, linear regression—because the problem involves predicting a numerical outcome (the number of medals won) rather than classifying data into discrete categories. Here are the key points justifying our model choice:
+1.Nature of the Target Variable:
+The target variable, medals, represents a count of medals won by a team. Although it is an integer, it is treated as a continuous variable in the context of prediction. Regression models are naturally suited for predicting continuous outcomes, whereas classification models are designed for categorical targets.
+
+2.Relationship Between Predictors and Outcome:
+Exploratory data analysis (EDA) revealed that there are linear relationships between the predictors (e.g., athletes and prev_medals) and the target variable. Linear regression is effective at modeling such relationships and can provide interpretable coefficients that indicate how changes in the predictors influence the predicted medals count.
+
+3.Simplicity and Interpretability:
+Linear regression is a straightforward and well-understood model. Its simplicity allows us to quickly assess the impact of individual features and to identify potential areas for further feature engineering or model refinement. In this case, the clear interpretability of the linear coefficients supports our understanding of how factors like team size and historical performance drive the number of medals.
+
+4.Suitability to the Data Structure:
+Given that the data is sourced from a structured CSV file with numerical columns (after preprocessing), a regression approach seamlessly integrates with the data's format. It efficiently handles continuous numeric data, making it a natural choice for the problem at hand.
+Overall, the regression model aligns well with the problem's objective—predicting a continuous outcome—and the data's characteristics, making it the most appropriate choice for this project.
+Model Training:
+Run the data preprocessing and model training script (e.g., in your Jupyter Notebook or Python script) to generate linear_regression_model.pkl.
+The linear regression model was instantiated from scikit-learn: 
 from sklearn.linear_model import LinearRegression
-
-# Instantiate model
 reg = LinearRegression()
-
-# Train the model
+The model was trained using the training dataset: 
 predictors = ["athletes", "prev_medals"]
 reg.fit(train[predictors], train["medals"])
-
-# Generate predictions
+Prediction:
+Predictions were generated for the test set: 
 predictions = reg.predict(test[predictors])
 test["predictions"] = predictions
-```
 
-**Interactive Element:**  
-- *Code Sandbox*: Run the above code directly [here](#) *(link to a live code editor like Google Colab or an embedded sandbox)*.
-
----
-
-## 6. Model Evaluation Metrics and Discussion
-
-### Metric Calculation
-```python
+6. Model Evaluation Metrics and Discussion
+Evaluation Metrics:
+Mean Absolute Error (MAE): 
+oMeasures the average absolute difference between predicted and actual values.
+Root Mean Squared Error (RMSE): 
+oThe square root of the average squared differences; provides insight into prediction error magnitude.
+R² Score: 
+oIndicates the proportion of variance in the target variable explained by the model.
+Metric Calculation:
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-import numpy as np
-
 mae = mean_absolute_error(test["medals"], test["predictions"])
 rmse = np.sqrt(mean_squared_error(test["medals"], test["predictions"]))
 r2 = r2_score(test["medals"], test["predictions"])
-
 print(f"Mean Absolute Error (MAE): {mae:.4f}")
 print(f"Root Mean Squared Error (RMSE): {rmse:.4f}")
 print(f"R² Score: {r2:.4f}")
-```
+Discussion:
+The evaluation metrics provide a clear understanding of how close the predictions are to the actual values.
+Error analysis per team was also performed, where the average prediction error was calculated and analyzed relative to the mean medals per team.
+Visualizations (histograms) of the error distribution were used to assess model performance.
 
-**Interactive Element:**  
-- *Try It Yourself*: Upload your test dataset and see the model’s evaluation metrics instantly [here](#).
+7. Interpretation of Results
+Key Insights:
+The predictors athletes and prev_medals significantly contribute to the prediction of medals.
+The model achieves a reasonable fit, as indicated by the R² score.
+The error analysis suggests that while the model performs well overall, some teams exhibit higher prediction errors, possibly due to factors not captured by the current features.
+Implications:
+The linear regression model provides a straightforward approach for predicting Olympic medals based on historical data.
+The insights can help in identifying areas for further feature engineering or model complexity enhancements.
+
+8. Deployment Details and Instructions
+API Deployment with FastAPI:
+The model has been deployed as an API using FastAPI, allowing users to obtain predictions via HTTP requests.
+API Endpoints:
+GET /: 
+oReturns a welcome message along with usage instructions.
+POST /predict/: 
+oAccepts a JSON payload with the following fields: team, country, year, athletes, age, and prev_medals.
+oReturns the predicted number of medals along with the input details.
+Running the API:
+1.Install Dependencies: 
+pip install fastapi uvicorn joblib pandas numpy scikit-learn
+2.Start the API: 
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+3.Access the API Documentation: 
+oNavigate to http://127.0.0.1:8000/docs for interactive API documentation and testing.
+Fix: Check Your Request JSON
+Correct Example (for Postman or /docs):
+json
+{
+  "team": "USA",
+  "country": "United States",
+  "year": 2012,
+  "athletes": 689,
+  "age": 26.7,
+  "prev_medals": 317.0,
+}
+
+
+9. Potential Limitations and Future Improvements
+Limitations:
+Feature Selection: 
+oOnly two predictors (athletes and prev_medals) were used. There might be additional relevant features (e.g., team budget, training facilities) that could enhance the model.
+Model Complexity: 
+oThe linear regression model may not capture complex nonlinear relationships in the data.
+Future Improvements:
+Data Enrichment: 
+oIncorporate more features or external data sources that may influence a team's performance.
+Advanced Modeling: 
+oExplore more complex models (e.g., ensemble methods, neural networks) to potentially improve prediction accuracy.
+Feature Engineering: 
+oImplement feature scaling, interaction terms, or polynomial features to capture nonlinear trends.
+API Enhancements: 
+oAdd endpoints for model retraining, logging, and detailed error reporting.
+User Interface: 
+oDevelop a simple front-end application for easier interaction with the API.
+
+
+
+10.References
+ML Individual Assignment Guidelines
+pandas Documentation
+scikit-learn Documentation
+FastAPI Documentation
 
 ---
 
-## 7. Interpretation of Results
 
-### Key Insights
-- `athletes` and `prev_medals` are strong predictors of `medals`.
 
-**Interactive Element:**  
-- *Discussion Board*: Share your interpretation of the results and compare them with others [here](#).
-
----
-
-## 8. Deployment Details and Instructions
-
-### Running the API
-1. **Install Dependencies:**
-```bash
-pip install fastapi uvicorn joblib pandas numpy scikit-learn
-```
-
-2. **Start the API:**
-```bash
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-```
-
-3. **Access API Documentation:**
-[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-
-**Interactive Element:**  
-- *Live API Demo*: Try out the API in real-time [here](#) *(link to deployed API or sandbox environment)*.
-
----
-
-## 9. Potential Limitations and Future Improvements
-
-### Future Improvements
-- **User Interface**: Develop a simple front-end for API interaction.
-
-**Interactive Element:**  
-- *Idea Submission*: Suggest features you’d like to see in the future UI [here](#).
-
----
-
-## 10. References
-- ML Individual Assignment Guidelines
-- [pandas Documentation](https://pandas.pydata.org/docs/)
-- [scikit-learn Documentation](https://scikit-learn.org/stable/documentation.html)
-- [FastAPI Documentation](https://fastapi.tiangolo.com/)
-
----
-
-Thank you for reviewing this project! **Got feedback or questions?** Drop them [here](#)!
 
