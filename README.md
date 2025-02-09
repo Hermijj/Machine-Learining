@@ -23,7 +23,7 @@ Most machine learning projects follow a similar outline, which we'll also follow
 
 File overview:
 
-* `olyompic_medal_pridiction.ipynb` - the main project code
+* `olyompic_medal.ipynb` - the main project code
 
 # Local Setup
 
@@ -53,3 +53,14 @@ You can download the files we'll use in this project here:
    ```bash
    pip install pandas numpy seaborn scikit-learn joblib fastapi uvicorn
 Open your browser and navigate to http://127.0.0.1:8000 for the welcome message.
+Fix: Check Your Request JSON
+Correct Example (for Postman or /docs):
+json
+{
+  "team": "USA",
+  "country": "United States",
+  "year": 2012,
+  "athletes": 689,
+  "age": 26.7,
+  "prev_medals": 317.0,
+}
