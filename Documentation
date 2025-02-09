@@ -30,10 +30,18 @@
 ### Objective
 Predict the number of medals an Olympic team will win based on historical performance data. This is approached as a regression task, with the number of medals being the target variable.
 
+**Interactive Element:**  
+- *Question*: What additional factors do you think could influence a team’s medal count? *(Add your thoughts below!)*
+
 ### Motivation
 Understanding which factors contribute to a team’s success can help in strategizing and resource allocation. This project focuses on two key predictors:
 - **Athletes**: The number of athletes on a team.
 - **Previous Medals**: The count of medals won in prior events.
+
+**Interactive Element:**  
+- *Poll*: Which factor do you believe has a stronger influence on medal counts?
+  - [ ] Number of Athletes
+  - [ ] Previous Medals
 
 ---
 
@@ -42,8 +50,8 @@ Understanding which factors contribute to a team’s success can help in strateg
 ### Data Source
 We utilized data from the [120 Years of Olympic History: Athletes and Results](https://www.kaggle.com/datasets/heesoo37/120-years-of-olympic-history-athletes-and-results) dataset originally hosted on Kaggle.
 
-### Download Links
-- [teams.csv](https://drive.google.com/uc?export=download&id=1L3YAlts8tijccIndVPB-mOsRpEpVawk7)
+**Interactive Element:**  
+- *Download*: [teams.csv](https://drive.google.com/uc?export=download&id=1L3YAlts8tijccIndVPB-mOsRpEpVawk7)
 
 ### Dataset Overview
 - **Rows:** 2144  
@@ -66,39 +74,23 @@ We utilized data from the [120 Years of Olympic History: Athletes and Results](h
 
 ## 3. Exploratory Data Analysis (EDA) Findings and Visualizations
 
-### Data Loading & Inspection
-- Loaded into a **pandas DataFrame**.
-- Identified missing values and data structure anomalies.
-
-### Summary Statistics
-- Computed **mean**, **median**, and **standard deviation** for all numeric columns.
-
-### Correlation Analysis
-- Significant correlations found between:
-  - `athletes` and `medals`
-  - `prev_medals` and `medals`
-
 ### Visualizations
 - **Scatter Plots with Regression Lines**: Relationships between `athletes` vs `medals`, and `age` vs `medals`.
 - **Histograms**: Distribution of the `medals` variable.
+
+**Interactive Element:**  
+- *Visualization Embed*: View dynamic scatter plots and histograms [here](#) *(link to an interactive chart or embedded visualization)*.
 
 ---
 
 ## 4. Data Preprocessing Steps and Choices
 
-### Conversion and Cleaning
-- Converted numeric columns using `pd.to_numeric`.
-- Dropped non-numeric columns that became entirely NaN.
-- Removed rows with missing values.
-
 ### Feature Selection
 - **Predictors**: `athletes`, `prev_medals`
 - **Target Variable**: `medals`
 
-### Train-Test Split
-- **80/20 split** based on year:
-  - Training set: `year < 2012`
-  - Testing set: `year >= 2012`
+**Interactive Element:**  
+- *Question*: Are there other features you would include in the model? *(Share your ideas!)*
 
 ### Post-Prediction Adjustments
 - Negative predictions set to zero.
@@ -107,15 +99,6 @@ We utilized data from the [120 Years of Olympic History: Athletes and Results](h
 ---
 
 ## 5. Model Selection and Training Details
-
-### Model Choice
-A **Linear Regression** model was selected due to the continuous nature of the target variable and the linear relationships observed in the data.
-
-### Justification
-1. **Continuous Target**: `medals` is a count but treated as continuous.
-2. **Linear Relationships**: Found via EDA between predictors and the target.
-3. **Simplicity & Interpretability**: Linear regression is straightforward and interpretable.
-4. **Data Suitability**: Fits the structured, numerical data well.
 
 ### Model Training
 ```python
@@ -133,14 +116,12 @@ predictions = reg.predict(test[predictors])
 test["predictions"] = predictions
 ```
 
+**Interactive Element:**  
+- *Code Sandbox*: Run the above code directly [here](#) *(link to a live code editor like Google Colab or an embedded sandbox)*.
+
 ---
 
 ## 6. Model Evaluation Metrics and Discussion
-
-### Evaluation Metrics
-- **Mean Absolute Error (MAE)**: Measures average absolute difference.
-- **Root Mean Squared Error (RMSE)**: Measures error magnitude.
-- **R² Score**: Indicates proportion of variance explained by the model.
 
 ### Metric Calculation
 ```python
@@ -156,9 +137,8 @@ print(f"Root Mean Squared Error (RMSE): {rmse:.4f}")
 print(f"R² Score: {r2:.4f}")
 ```
 
-### Discussion
-- Metrics indicate reasonable model performance.
-- Error distribution visualized with histograms.
+**Interactive Element:**  
+- *Try It Yourself*: Upload your test dataset and see the model’s evaluation metrics instantly [here](#).
 
 ---
 
@@ -166,23 +146,13 @@ print(f"R² Score: {r2:.4f}")
 
 ### Key Insights
 - `athletes` and `prev_medals` are strong predictors of `medals`.
-- R² score indicates a reasonable fit.
-- Some teams show higher errors, likely due to unaccounted factors.
 
-### Implications
-- Provides insights into team performance.
-- Identifies areas for feature engineering and model refinement.
+**Interactive Element:**  
+- *Discussion Board*: Share your interpretation of the results and compare them with others [here](#).
 
 ---
 
 ## 8. Deployment Details and Instructions
-
-### API Deployment with FastAPI
-Deployed as an API using **FastAPI** for accessible predictions.
-
-### API Endpoints
-- **GET /**: Welcome message and usage instructions.
-- **POST /predict/**: Accepts JSON input and returns predicted medals.
 
 ### Running the API
 1. **Install Dependencies:**
@@ -198,66 +168,18 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 3. **Access API Documentation:**
 [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
-### API Code Overview (main.py)
-```python
-from fastapi import FastAPI
-import joblib
-import pandas as pd
-from pydantic import BaseModel
-
-# Load the trained model
-model = joblib.load("linear_regression_model.pkl")
-
-app = FastAPI(
-    title="Olympic Medals Prediction API",
-    description="Predict the number of medals a team will win based on key features.",
-    version="1.0"
-)
-
-class MedalsInput(BaseModel):
-    team: str
-    country: str
-    year: int
-    athletes: int
-    age: float
-    prev_medals: float
-
-@app.get("/")
-def welcome():
-    return {"message": "Welcome to the Olympic Medals Prediction API! Use /predict/ to get medal predictions."}
-
-@app.post("/predict/")
-def predict_medals(data: MedalsInput):
-    try:
-        input_data = pd.DataFrame([data.dict()])
-        predictors = ["athletes", "prev_medals"]
-        prediction = model.predict(input_data[predictors])[0]
-        prediction = max(0, round(prediction))  # Ensure non-negative integer output
-        return {
-            "message": "Prediction successful!",
-            "team": data.team,
-            "country": data.country,
-            "year": data.year,
-            "predicted_medals": prediction
-        }
-    except Exception as e:
-        return {"error": "Prediction failed. Please check your input data.", "details": str(e)}
-```
+**Interactive Element:**  
+- *Live API Demo*: Try out the API in real-time [here](#) *(link to deployed API or sandbox environment)*.
 
 ---
 
 ## 9. Potential Limitations and Future Improvements
 
-### Limitations
-- **Limited Features**: Only `athletes` and `prev_medals` used.
-- **Model Complexity**: Linear regression may not capture nonlinear relationships.
-
 ### Future Improvements
-- **Data Enrichment**: Incorporate additional features (e.g., team budget, training quality).
-- **Advanced Models**: Explore ensemble methods or neural networks.
-- **Feature Engineering**: Apply feature scaling, interaction terms, or polynomial features.
-- **API Enhancements**: Add retraining endpoints, logging, and error reporting.
 - **User Interface**: Develop a simple front-end for API interaction.
+
+**Interactive Element:**  
+- *Idea Submission*: Suggest features you’d like to see in the future UI [here](#).
 
 ---
 
@@ -269,5 +191,5 @@ def predict_medals(data: MedalsInput):
 
 ---
 
-Thank you for reviewing this project!
+Thank you for reviewing this project! **Got feedback or questions?** Drop them [here](#)!
 
