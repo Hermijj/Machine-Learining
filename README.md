@@ -7,7 +7,7 @@ ID:1401389
 
 Submitted to: Derebew
 Submission Date 02/02/2025
-Open your browser and navigate to http://127.0.0.1:8000 for the welcome message.
+Open your browser and navigate to http://127.0.0.1:8000/docs for the welcome message.
 Render link  on  https://machine-learining-nl9l.onrender.com
 
 # Olympic Medals Prediction Project
