@@ -7,6 +7,8 @@ ID:1401389
 
 Submitted to: Derebew
 Submission Date 02/02/2025
+Open your browser and navigate to http://127.0.0.1:8000 for the welcome message.
+Render link  on  https://machine-learining-nl9l.onrender.com
 
 # Olympic Medals Prediction Project
 
@@ -63,6 +65,7 @@ You can download the files we'll use in this project here:
    ```bash
    pip install pandas numpy seaborn scikit-learn joblib fastapi uvicorn
 Open your browser and navigate to http://127.0.0.1:8000 for the welcome message.
+On render deployed link  https://machine-learining-nl9l.onrender.com
 Fix: Check Your Request JSON
 Correct Example (for Postman or /docs):
 json
