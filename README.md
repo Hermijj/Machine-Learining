@@ -1,3 +1,13 @@
+Debre Birhan University
+College of computing Department of Software Engineering
+Fundamental of machine learning
+
+NAME: Hermela Gashaw
+ID:1401389
+
+Submitted to: Derebew
+Submission Date 02/02/2025
+
 # Olympic Medals Prediction Project
 
 # Project Overview
